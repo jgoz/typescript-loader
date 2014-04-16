@@ -2,7 +2,7 @@
   "name": "typescript-loader",
   "version": "0.1.0",
   "description": "Typescript loader for webpack",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "gulp test"
   },
@@ -20,5 +20,17 @@
   "bugs": {
     "url": "https://github.com/jgoz/typescript-loader/issues"
   },
-  "homepage": "https://github.com/jgoz/typescript-loader"
+  "homepage": "https://github.com/jgoz/typescript-loader",
+  "dependencies": {
+    "loader-utils": "^0.2.2",
+    "typescript": "^1.0.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.6.0",
+    "gulp-jshint": "^1.5.3",
+    "gulp-mocha": "^0.4.1",
+    "jshint": "^2.5.0",
+    "mocha": "^1.18.2",
+    "glob": "^3.2.9"
+  }
 }
