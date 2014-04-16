@@ -1,0 +1,24 @@
+{
+  "name": "typescript-loader",
+  "version": "0.1.0",
+  "description": "Typescript loader for webpack",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jgoz/typescript-loader.git"
+  },
+  "keywords": [
+    "typescript",
+    "typescript-loader",
+    "webpack"
+  ],
+  "author": "John Gozde <john@gozde.ca>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jgoz/typescript-loader/issues"
+  },
+  "homepage": "https://github.com/jgoz/typescript-loader"
+}
