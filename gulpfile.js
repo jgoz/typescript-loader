@@ -37,12 +37,10 @@ gulp.task("build", function (done) {
     args.push("--module", "commonjs");
     args.push("--noImplicitAny");
     args.push("--target", "ES5");
-    args.push("--out", "dist/index.js");
+    args.push("--outDir", "dist");
+    args.push("--out", "index.js");
     args.push.apply(args, glob.sync("./*.ts"));
     args.push.apply(args, glob.sync("./src/*.ts"));
-
-    console.log(tscpath);
-    console.log(args.join(" "));
 
     var tsc = spawn("node", args, { stdio: "inherit" });
     tsc.on("exit", function (code) {

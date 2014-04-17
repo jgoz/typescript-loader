@@ -26,11 +26,12 @@
     "typescript": "^1.0.0"
   },
   "devDependencies": {
+    "glob": "^3.2.9",
     "gulp": "^3.6.0",
     "gulp-jshint": "^1.5.3",
     "gulp-mocha": "^0.4.1",
     "jshint": "^2.5.0",
-    "mocha": "^1.18.2",
-    "glob": "^3.2.9"
+    "jshint-stylish": "^0.1.5",
+    "mocha": "^1.18.2"
   }
 }
