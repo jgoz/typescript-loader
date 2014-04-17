@@ -43,10 +43,6 @@ declare module "webpack" {
         callback(error: any, content: string, sourceMap?: Object): void;
         callback(error: any, content: NodeBuffer, sourceMap?: Object): void;
     }
-
-    export interface LoaderPlugin extends LoaderContext {
-        (source: string): void;
-    }
 }
 
 declare module "loader-utils" {
