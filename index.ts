@@ -1,47 +1,55 @@
 /// <reference path="defs/node/node.d.ts" />
 /// <reference path="defs/webpack.d.ts" />
+/// <reference path="defs/temp.d.ts" />
 
+import fs = require("fs");
 import loaderUtils = require("loader-utils");
+import path = require("path");
+import temp = require("temp");
+import compiler = require("./src/compiler");
 
-//-------------------------------------------
-enum CodeGenTarget { es3 = 0, es5 = 1 };
-enum ModuleGenTarget { none = 0, commonjs = 1, amd = 2 };
+import Settings = require("./src/settings");
 
-//-------------------------------------------
-class Settings {
-    declaration: boolean;
-    module: ModuleGenTarget;
-    noResolve: boolean;
-    noImplicitAny: boolean;
-    out: string;
-    outDir: string;
-    removeComments: boolean;
-    sourcemap: boolean;
-    target: CodeGenTarget;
+temp.track(); // clean up files on exit
 
-    constructor(query: Settings, debug: boolean) {
-        this.declaration = query.declaration || false;
-        this.module = query.module; //(typeof query.module == "string" ? (<any>ModuleGenTarget)[query.module.toLowerCase()] : ModuleGenTarget.none);
-        this.noResolve = query.noResolve == true;
-        this.noImplicitAny = query.noImplicitAny == true;
-        this.out = query.out;
-        this.outDir = query.outDir;
-        this.removeComments = query.removeComments == true;
-        this.sourcemap = query.sourcemap || debug;
-        this.target = query.target; //(typeof query.target == "string" ? (<any>CodeGenTarget)[query.target.toLowerCase()] : CodeGenTarget.es3);
-    }
+function replaceExt(filePath: string, ext: string) {
+    return path.basename(filePath, path.extname(filePath)) + ext;
 }
 
-
-//-------------------------------------------
-var typescriptLoader = function (source: string) {
+function loader (source: string): void {
     this.cacheable();
     this.async();
 
     var tsRequest = loaderUtils.getRemainingRequest(this);
-    var jsRequest = loaderUtils.getCurrentRequest(this);
-    var settings = new Settings(<Settings>loaderUtils.parseQuery(this.query), this.debug);
+    var settings: Settings;
+    try {
+        settings = new Settings(<Settings>loaderUtils.parseQuery(this.query), this.debug);
+    } catch (e) {
+        return this.callback(e);
+    }
 
-};
+    temp.mkdir("tsloader", (err, dirPath) => {
+        if (err) { return this.callback(err); }
+        settings.outDir = dirPath;
 
-module.exports = typescriptLoader;
+        compiler.compile(tsRequest, settings).done((res) => {
+            if (res.code !== 0) {
+                res.output.forEach(out => { this.emitError(out); });
+                return this.callback("'typescript-loader': Compilation failed for '" + tsRequest + "'");
+            }
+
+            var outFile: string = settings.out || replaceExt(path.basename(tsRequest), ".js");
+            var output: NodeBuffer = fs.readFileSync(path.join(dirPath, outFile));
+
+            if (settings.sourcemap) {
+                var mapFile: string = outFile + ".map";
+                var sourcemap: NodeBuffer = fs.readFileSync(path.join(dirPath, mapFile));
+                this.callback(null, output, sourcemap);
+            } else {
+                this.callback(null, output);
+            }
+        });
+    });
+}
+
+export = loader;
