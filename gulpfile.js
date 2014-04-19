@@ -48,7 +48,7 @@ gulp.task("build", function (done) {
     });
     tsc.on("error", function (err) {
         done(err);
-    })
+    });
 });
 
 gulp.task("test", ["test:unit", "test:integration"]);
