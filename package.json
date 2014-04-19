@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/jgoz/typescript-loader",
   "dependencies": {
+    "bluebird": "~1.2.3",
     "loader-utils": "^0.2.2",
+    "temp": "~0.7.0",
     "typescript": "^1.0.0"
   },
   "devDependencies": {
