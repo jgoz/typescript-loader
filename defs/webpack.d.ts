@@ -1,6 +1,6 @@
 /// <reference path="node/node.d.ts" />
 
-declare module "webpack" {
+declare module webpack {
     export interface Loader {
         request: string;
         path: string;
@@ -40,14 +40,12 @@ declare module "webpack" {
         clearDependencies(): void;
         emitFile(name: string, content: string, sourceMap?: Object): void;
         emitFile(name: string, content: NodeBuffer, sourceMap?: Object): void;
-        callback(error: any, content: string, sourceMap?: Object): void;
-        callback(error: any, content: NodeBuffer, sourceMap?: Object): void;
+        callback(error: any, content?: string, sourceMap?: Object): void;
+        callback(error: any, content?: NodeBuffer, sourceMap?: Object): void;
     }
 }
 
 declare module "loader-utils" {
-    import webpack = require("webpack");
-
     export function parseQuery(query: string): Object;
     export function getCurrentRequest(loaderContext: webpack.LoaderContext): string;
     export function getRemainingRequest(loaderContext: webpack.LoaderContext): string;
