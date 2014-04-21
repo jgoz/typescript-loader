@@ -6,9 +6,10 @@ import fs = require("fs");
 import loaderUtils = require("loader-utils");
 import path = require("path");
 import temp = require("temp");
+import Promise = require("bluebird");
+
 import compiler = require("./src/compiler");
 import transform = require("./src/transform");
-
 import Settings = require("./src/settings");
 
 temp.track(); // clean up files on exit

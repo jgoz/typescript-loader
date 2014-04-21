@@ -16,7 +16,7 @@ export interface CompileResult {
 }
 
 function executeNode (args: string[]): Promise<CompileResult> {
-    return new Promise((resolve: (value: CompileResult) => void, reject: (reason: any) => void) => {
+    return new Promise<CompileResult>((resolve, reject) => {
         var proc = spawn("node", args, { stdio: "pipe" });
         var output: string[] = [];
 
