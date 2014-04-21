@@ -22,7 +22,9 @@ function loader (source: string): void {
     this.cacheable();
     this.async();
 
-    var tsRequest = loaderUtils.getRemainingRequest(this);
+    var loaderRequest = loaderUtils.getCurrentRequest(this);
+    var fileRequest = loaderUtils.getRemainingRequest(this);
+
     var settings: Settings;
     try {
         settings = new Settings(<Settings>loaderUtils.parseQuery(this.query), this.debug);
@@ -34,23 +36,24 @@ function loader (source: string): void {
         if (err) { return this.callback(err); }
         settings.outDir = dirPath;
 
-        compiler.compile(tsRequest, settings).then((res) => {
+        compiler.compile(fileRequest, settings).then((res) => {
             if (res.code !== 0) {
                 res.output.forEach(out => { this.emitError(out); });
-                //return this.callback("'typescript-loader': Compilation failed for '" + tsRequest + "'");
             }
 
-            var outFile: string = replaceExt(path.basename(tsRequest), ".js");
+            var outFile: string = replaceExt(path.basename(fileRequest), ".js");
             var outStream: ReadableStream = fs.createReadStream(path.join(dirPath, outFile), { encoding: "utf8" });
 
-            transform.output(outStream, settings).then(output => {
-                if (settings.sourcemap) {
-                    var mapFile: string = outFile + ".map";
-                    var sourcemap: NodeBuffer = fs.readFileSync(path.join(dirPath, mapFile));
-                    this.callback(null, output, JSON.parse(sourcemap.toString()));
-                } else {
-                    this.callback(null, output);
-                }
+            var output: Promise<string> = transform.output(outStream, settings);
+            var sourcemap: Promise<webpack.SourceMap>;
+
+            if (settings.sourcemap) {
+                var mapStream: ReadableStream = fs.createReadStream(path.join(dirPath, outFile + ".map"), { encoding: "utf8" });
+                sourcemap = transform.sourcemap(mapStream, loaderRequest, source);
+            }
+
+            Promise.all([output, sourcemap]).spread((o: string, sm: webpack.SourceMap) => {
+                this.callback(null, o, sm);
             });
         }).catch(err => {
             this.callback(err);

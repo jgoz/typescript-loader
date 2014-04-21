@@ -43,6 +43,16 @@ declare module webpack {
         callback(error: any, content?: string, sourceMap?: Object): void;
         callback(error: any, content?: NodeBuffer, sourceMap?: Object): void;
     }
+
+    export interface SourceMap {
+        version: number;
+        sources: string[];
+        sourcesContent?: string[];
+        names: string[];
+        mappings: string;
+        file?: string;
+        sourcesRoot?: string;
+    }
 }
 
 declare module "loader-utils" {

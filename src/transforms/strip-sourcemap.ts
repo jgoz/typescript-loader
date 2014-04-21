@@ -1,19 +1,19 @@
 /// <reference path="../../defs/node/node.d.ts" />
-/// <reference path="../../defs/through/through.d.ts" />
+/// <reference path="../../defs/through2.d.ts" />
 
-import stream = require("stream");
-import through = require("through");
+import through = require("through2");
 import Settings = require("../settings");
 
 var sourcemapPattern = /^\s*\/\/[#@] sourceMap.*=.*(\r\n|\n)?/gm;
 
 function stripSourcemap(settings: Settings): ReadWriteStream {
     if (settings.sourcemap) {
-        return through(function write(data: string) {
-            this.queue(data.replace(sourcemapPattern, ""));
+        return through(function transform(data: NodeBuffer, enc: string, callback: Function) {
+            this.push(data.toString().replace(sourcemapPattern, ""));
+            callback();
         });
     } else {
-        return new stream.PassThrough();
+        return through();
     }
 }
 
