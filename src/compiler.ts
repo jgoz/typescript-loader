@@ -48,9 +48,6 @@ function resolveTypeScriptBinPath(): string {
 }
 
 function getTsc(binPath: string): string {
-    //var pkg = JSON.parse(fs.readFileSync(path.resolve(binPath, '..', 'package.json')).toString());
-    //grunt.log.writeln('Using tsc v' + pkg.version);
-
     return path.join(binPath, 'tsc');
 }
 
@@ -58,10 +55,5 @@ export function compile (file: string, settings: Settings): Promise<CompileResul
     var args: string[] = settings.getArgs().concat('"' + path.resolve(file) + '"');
     var tsc: string = getTsc(resolveTypeScriptBinPath());
 
-    return executeNode([tsc].concat(args)).then((result: CompileResult) => {
-        // TODO: Do something with result?
-        return Promise.cast(result);
-    }, (err) => {
-        return err;
-    });
+    return executeNode([tsc].concat(args));
 }

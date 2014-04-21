@@ -6,7 +6,6 @@ class Settings {
     module: string;
     noResolve: boolean;
     noImplicitAny: boolean;
-    out: string;
     outDir: string;
     removeComments: boolean;
     sourcemap: boolean;
@@ -27,7 +26,6 @@ class Settings {
         this.module = moduleId;
         this.noResolve = query.noResolve === true;
         this.noImplicitAny = query.noImplicitAny === true;
-        this.out = query.out;
         this.outDir = query.outDir;
         this.removeComments = query.removeComments === true;
         this.sourcemap = query.sourcemap || debug;
@@ -48,9 +46,6 @@ class Settings {
         }
         if (this.noImplicitAny) {
             args.push("--noImplicitAny");
-        }
-        if (this.out) {
-            args.push("--out", this.out);
         }
         if (this.outDir) {
             args.push("--outDir", this.outDir);
