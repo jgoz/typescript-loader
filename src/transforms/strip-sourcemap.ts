@@ -5,16 +5,16 @@ import stream = require("stream");
 import through = require("through");
 import Settings = require("../settings");
 
-var dependencyPattern = /^\/\/\/\s*<(amd-)?dependency\s+path\s*=\s*("|')(.+?)("|')\s*\/\s*>\s*$/gm;
+var sourcemapPattern = /^\s*\/\/[#@] sourceMap.*=.*(\r\n|\n)?/gm;
 
-function rewriteDependencies(settings: Settings): ReadWriteStream {
-    if (settings.module === "commonjs") {
+function stripSourcemap(settings: Settings): ReadWriteStream {
+    if (settings.sourcemap) {
         return through(function write(data: string) {
-            this.queue(data.replace(dependencyPattern, "require($2$3$4);"));
+            this.queue(data.replace(sourcemapPattern, ""));
         });
     } else {
         return new stream.PassThrough();
     }
 }
 
-export = rewriteDependencies;
+export = stripSourcemap;

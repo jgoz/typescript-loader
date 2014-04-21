@@ -13,8 +13,6 @@ import Settings = require("./src/settings");
 
 temp.track(); // clean up files on exit
 
-asdf();
-
 function replaceExt(filePath: string, ext: string) {
     return path.basename(filePath, path.extname(filePath)) + ext;
 }

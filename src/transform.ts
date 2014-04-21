@@ -7,6 +7,7 @@ import Promise = require("bluebird");
 import Settings = require("./settings");
 
 import dependency = require("./transforms/dependency");
+import stripSourcemap = require("./transforms/strip-sourcemap");
 
 function streamPromise(stream: ReadableStream): Promise<string> {
     return new Promise((resolve: (value: string) => void, reject: (reason: any) => void) => {
@@ -19,5 +20,6 @@ function streamPromise(stream: ReadableStream): Promise<string> {
 
 export function output(stream: ReadableStream, settings: Settings): Promise<string> {
     return streamPromise(stream
-        .pipe(dependency(settings)));
+        .pipe(dependency(settings))
+        .pipe(stripSourcemap(settings)));
 }
