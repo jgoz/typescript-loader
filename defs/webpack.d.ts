@@ -51,7 +51,7 @@ declare module webpack {
         names: string[];
         mappings: string;
         file?: string;
-        sourcesRoot?: string;
+        sourceRoot?: string;
     }
 }
 
