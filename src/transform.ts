@@ -3,16 +3,16 @@
 /// <reference path="../defs/webpack.d.ts" />
 
 import Promise = require("bluebird");
-import Settings = require("./settings");
+import CompileOptions = require("./options");
 
 import dependency = require("./transforms/dependency");
 import stripSourcemap = require("./transforms/strip-sourcemap");
 import toSourcemap = require("./transforms/sourcemap");
 
-export function output(stream: ReadableStream, settings: Settings): Promise<string> {
+export function output(stream: ReadableStream, options: CompileOptions): Promise<string> {
     var outputStream = stream
-        .pipe(dependency(settings))
-        .pipe(stripSourcemap(settings));
+        .pipe(dependency(options))
+        .pipe(stripSourcemap(options));
 
     return new Promise<string>((resolve, reject) => {
         var output: string = "";
