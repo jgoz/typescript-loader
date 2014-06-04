@@ -1,25 +1,18 @@
 /// <reference path="../defs/node/node.d.ts" />
 /// <reference path="../defs/bluebird/bluebird.d.ts" />
 /// <reference path="../defs/webpack.d.ts" />
-/// <reference path="../defs/ts-compiler.d.ts" />
 
-import ts = require("ts-compiler");
 import Promise = require("bluebird");
-import Stream = require("stream")
+import CompileOptions = require("./options");
 
 import dependency = require("./transforms/dependency");
 import stripSourcemap = require("./transforms/strip-sourcemap");
 import toSourcemap = require("./transforms/sourcemap");
-import util = require("./util");
 
-export function output(text: string, options: ts.ICompilerOptions): Promise<string> {
-    var textStream = new util.StringReader(text);
-
-    var outputStream = textStream
+export function output(stream: NodeJS.ReadableStream, options: CompileOptions): Promise<string> {
+    var outputStream = stream
         .pipe(dependency(options))
         .pipe(stripSourcemap(options));
-
-    textStream.resume();
 
     return new Promise<string>((resolve, reject) => {
         var output: string = "";
@@ -29,11 +22,8 @@ export function output(text: string, options: ts.ICompilerOptions): Promise<stri
     });
 }
 
-export function sourcemap(text: string, outputFileName: string, source: string): Promise<webpack.SourceMap> {
-    var textStream = new util.StringReader(text);
-
-    var sourcemapStream = textStream.pipe(toSourcemap(outputFileName, source));
-    textStream.resume();
+export function sourcemap(stream: NodeJS.ReadableStream, request: string, source: string): Promise<webpack.SourceMap> {
+    var sourcemapStream = stream.pipe(toSourcemap(request, source));
 
     return new Promise<webpack.SourceMap>((resolve, reject) => {
         var result: webpack.SourceMap;
