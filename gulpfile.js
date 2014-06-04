@@ -17,18 +17,7 @@ gulp.task("jshint", function () {
 });
 
 //-------------------------------------------
-// Execute unit tests.
-gulp.task("test:unit", function () {
-    return gulp.src("./tests/*.js").pipe(mocha());
-});
-
-//-------------------------------------------
-// Execute integration tests.
-gulp.task("test:integration", function () {
-    return gulp.src("./tests/integration/*.js").pipe(mocha());
-});
-
-function build(watch, done) {
+function build(src, watch, done) {
     var typescriptPath = path.resolve(require.resolve("typescript"));
     var tscpath = path.join(path.dirname(typescriptPath), "tsc");
 
@@ -40,8 +29,7 @@ function build(watch, done) {
     if (watch) {
         args.push("--watch");
     }
-    args.push.apply(args, glob.sync("./*.ts"));
-    args.push.apply(args, glob.sync("./src/*.ts"));
+    args.push.apply(args, src);
 
     var tsc = spawn("node", args, { stdio: "inherit" });
     tsc.on("exit", function (code) {
@@ -57,17 +45,31 @@ function build(watch, done) {
     });
 }
 
+var sources = glob.sync("./*.ts").concat(glob.sync("./src/*.ts"));
+
 //-------------------------------------------
 // Build project for distribution
 gulp.task("build", function (done) {
-    build(false, done);
+    build(sources, false, done);
 });
 
 //-------------------------------------------
 // Watch project sources
 gulp.task("watch", function (done) {
-    build(true, done);
+    build(sources, true, done);
 });
 
-gulp.task("test", ["test:unit", "test:integration"]);
+//-------------------------------------------
+// Build tests
+gulp.task("test:build", function (done) {
+    build(glob.sync("./test/*.ts"), false, done);
+});
+
+//-------------------------------------------
+// Run tests
+gulp.task("test:run", ["test:build"], function () {
+    return gulp.src("./dist/test/*.js").pipe(mocha({ reporter: "spec" }));
+});
+
+gulp.task("test", ["test:build", "test:run"]);
 gulp.task("default", ["jshint", "test"]);
