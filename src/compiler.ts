@@ -20,8 +20,8 @@ function executeNode (args: string[]): Promise<CompileResult> {
         var proc = spawn("node", args, { stdio: "pipe" });
         var output: string[] = [];
 
-        proc.stdout.on("data", (data: string) => { output.push(data); });
-        proc.stderr.on("data", (data: string) => { output.push(data); });
+        proc.stdout.on("data", (data: NodeBuffer) => { output.push(data.toString()); });
+        proc.stderr.on("data", (data: NodeBuffer) => { output.push(data.toString()); });
 
         proc.on("error", reject);
         proc.on("exit", function onExit (code: number) {
