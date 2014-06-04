@@ -17,7 +17,8 @@
   "keywords": [
     "typescript",
     "typescript-loader",
-    "webpack"
+    "webpack",
+    "webpack-loader"
   ],
   "author": "John Gozde <john@gozde.ca>",
   "license": "MIT",
