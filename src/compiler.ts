@@ -30,13 +30,17 @@ export function compile (ctx: CompileContext): Promise<CompileResult> {
             if (err) {
                 reject(err);
             } else {
-                var jsResult: ts.OutputFile = results.filter((res: ts.OutputFile) => { return res.fileType === 0; /* js */ })[0];
+                var jsResult: ts.OutputFile = results.filter((res: ts.OutputFile) => {
+                    return res.fileType === ts.api.OutputFileType.JavaScript;
+                })[0];
 
                 var output: Promise<string> = transform.output(jsResult.text, ctx.options);
                 var sourcemap: Promise<webpack.SourceMap>;
 
                 if (ctx.options.sourcemap) {
-                    var mapResult: ts.OutputFile = results.filter((res: ts.OutputFile) => { return res.fileType === 1; /* sourcemap */ })[0];
+                    var mapResult: ts.OutputFile = results.filter((res: ts.OutputFile) => {
+                        return res.fileType === ts.api.OutputFileType.SourceMap;
+                    })[0];
                     sourcemap = transform.sourcemap(mapResult.text, ctx.webpackRequest, ctx.source);
                 }
 
