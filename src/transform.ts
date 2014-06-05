@@ -1,6 +1,7 @@
 /// <reference path="../defs/node/node.d.ts" />
 /// <reference path="../defs/bluebird/bluebird.d.ts" />
 /// <reference path="../defs/webpack.d.ts" />
+/// <reference path="../defs/ts-compiler.d.ts" />
 
 import ts = require("ts-compiler");
 import Promise = require("bluebird");

@@ -1,5 +1,3 @@
-/// <reference path="node/node.d.ts" />
-
 declare module webpack {
     export interface Loader {
         request: string;
