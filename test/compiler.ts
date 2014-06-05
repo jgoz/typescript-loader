@@ -3,26 +3,25 @@
 
 import assert = require("assert");
 import compiler = require("../src/compiler");
-import Settings = require("../src/settings");
+import fs = require("fs");
+import ts = require("ts-compiler");
+
+function createContext(file: string, options: ts.ICompilerOptions): compiler.CompileContext {
+    return {
+        fileName: file,
+        source: fs.readFileSync(file).toString(),
+        options: options
+    };
+}
 
 describe("compiler", function() {
+    this.timeout(5000);
 
-    describe("using default settings", function() {
-        var settings: Settings = new Settings(<Settings>{
-            declaration: false,
-            module: "",
-            noResolve: false,
-            noImplicitAny: false,
-            outDir: "dist/test/fixture",
-            removeComments: false,
-            sourcemap: false,
-            target: ""
-        }, false);
+    describe("using default options", function() {
 
         it("compiles without error", function(done) {
-            compiler.compile("./test/fixture/a.ts", settings).done((result) => {
-                assert.strictEqual(result.code, 0);
-                assert.deepEqual(result.output, []);
+            compiler.compile(createContext("./test/fixture/a.ts", {})).done(result => {
+                assert.ok(result.output.indexOf("function A()"));
                 done();
             });
         });

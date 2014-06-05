@@ -1,59 +1,55 @@
 /// <reference path="../defs/node/node.d.ts" />
-/// <reference path="../defs/bluebird/bluebird.d.ts" />
 /// <reference path="../defs/webpack.d.ts" />
 
-import fs = require("fs");
-import path = require("path");
-
-import Settings = require("./settings");
+import ts = require("ts-compiler");
 import Promise = require("bluebird");
-var spawn = require("child_process").spawn;
+
+import transform = require("./transform");
 
 export interface CompileResult {
-    code: number;
-    output: string[];
-    fileCount?: number;
+    output: string;
+    sourcemap?: webpack.SourceMap;
 }
 
-function executeNode (args: string[]): Promise<CompileResult> {
+export interface CompileContext {
+    fileName: string;
+    webpackRequest?: string;
+    source: string;
+    options: ts.ICompilerOptions;
+    onInfo?: (info: string) => void;
+    onError?: (err: string) => void;
+}
+
+export function compile (ctx: CompileContext): Promise<CompileResult> {
+
+    ctx.options.skipWrite = true;
+
     return new Promise<CompileResult>((resolve, reject) => {
-        var proc = spawn("node", args, { stdio: "pipe" });
-        var output: string[] = [];
+        var compiler = ts.compile([ctx.fileName], ctx.options, (err: Error, results: ts.OutputFile[]) => {
+            if (err) {
+                reject(err);
+            } else {
+                var jsResult: ts.OutputFile = results.filter((res: ts.OutputFile) => { return res.fileType === 0; /* js */ })[0];
 
-        proc.stdout.on("data", (data: NodeBuffer) => { output.push(data.toString()); });
-        proc.stderr.on("data", (data: NodeBuffer) => { output.push(data.toString()); });
+                var output: Promise<string> = transform.output(jsResult.text, ctx.options);
+                var sourcemap: Promise<webpack.SourceMap>;
 
-        proc.on("error", reject);
-        proc.on("exit", function onExit (code: number) {
-            var result: CompileResult = {
-                code: code,
-                output: output
-            };
+                if (ctx.options.sourcemap) {
+                    var mapResult: ts.OutputFile = results.filter((res: ts.OutputFile) => { return res.fileType === 1; /* sourcemap */ })[0];
+                    sourcemap = transform.sourcemap(mapResult.text, ctx.webpackRequest, ctx.source);
+                }
 
-            resolve(result);
+                Promise.all([output, sourcemap]).spread((o: string, sm: webpack.SourceMap) => {
+                    resolve({ output: o, sourcemap: sm });
+                });
+            }
         });
+
+        if (ctx.onInfo) {
+            compiler.on("info", ctx.onInfo);
+        }
+        if (ctx.onError) {
+            compiler.on("error", ctx.onError);
+        }
     });
-}
-
-function resolveTypeScriptBinPath(): string {
-    var ownRoot = path.resolve(path.dirname((module).filename), '../..');
-    var userRoot = path.resolve(ownRoot, '..', '..');
-    var binSub = path.join('node_modules', 'typescript', 'bin');
-
-    if (fs.existsSync(path.join(userRoot, binSub))) {
-        // Using project override
-        return path.join(userRoot, binSub);
-    }
-    return path.join(ownRoot, binSub);
-}
-
-function getTsc(binPath: string): string {
-    return path.join(binPath, 'tsc');
-}
-
-export function compile (file: string, settings: Settings): Promise<CompileResult> {
-    var args: string[] = settings.getArgs().concat('"' + path.resolve(file) + '"');
-    var tsc: string = getTsc(resolveTypeScriptBinPath());
-
-    return executeNode([tsc].concat(args));
 }
