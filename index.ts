@@ -1,18 +1,14 @@
 /// <reference path="defs/node/node.d.ts" />
 /// <reference path="defs/webpack.d.ts" />
-/// <reference path="defs/temp.d.ts" />
 
 import fs = require("fs");
 import loaderUtils = require("loader-utils");
 import path = require("path");
-import temp = require("temp");
+import ts = require("ts-compiler");
 import Promise = require("bluebird");
 
 import compiler = require("./src/compiler");
-import transform = require("./src/transform");
-import Settings = require("./src/settings");
 
-temp.track(); // clean up files on exit
 
 function replaceExt(filePath: string, ext: string) {
     return path.basename(filePath, path.extname(filePath)) + ext;
@@ -25,41 +21,30 @@ function loader (source: string): void {
     var loaderRequest = loaderUtils.getCurrentRequest(this);
     var fileRequest = loaderUtils.getRemainingRequest(this);
 
-    var settings: Settings;
+    var options: ts.ICompilerOptions;
     try {
-        settings = new Settings(<Settings>loaderUtils.parseQuery(this.query), this.debug);
+        options = <ts.ICompilerOptions>loaderUtils.parseQuery(this.query);
     } catch (e) {
         return this.callback(e);
     }
 
-    temp.mkdir("tsloader", (err, dirPath) => {
-        if (err) { return this.callback(err); }
-        settings.outDir = dirPath;
+    if (this.options.devtool) { // sourcemaps requested
+        options.sourcemap = true;
+    }
 
-        compiler.compile(fileRequest, settings).then((res) => {
-            if (res.code !== 0) {
-                res.output.forEach(out => { this.emitError(out); });
-            }
-
-            var outFile: string = replaceExt(path.basename(fileRequest), ".js");
-            var outStream: ReadableStream = fs.createReadStream(path.join(dirPath, outFile), { encoding: "utf8" });
-
-            var output: Promise<string> = transform.output(outStream, settings);
-            var sourcemap: Promise<webpack.SourceMap>;
-
-            if (settings.sourcemap) {
-                var mapStream: ReadableStream = fs.createReadStream(path.join(dirPath, outFile + ".map"), { encoding: "utf8" });
-                sourcemap = transform.sourcemap(mapStream, loaderRequest, source);
-            }
-
-            Promise.all([output, sourcemap]).spread((o: string, sm: webpack.SourceMap) => {
-                this.callback(null, o, sm);
-            });
-        }).catch(err => {
-            this.callback(err);
-        }).error(err => {
-            this.callback(err);
-        });
+    compiler.compile({
+        fileName: fileRequest,
+        webpackRequest: loaderRequest,
+        source: source,
+        options: options,
+        onInfo: this.emitWarning,
+        onError: this.emitError
+    }).then(res => {
+        this.callback(null, res.output, res.sourcemap);
+    }).catch(err => {
+        this.callback(err);
+    }).error(err => {
+        this.callback(err);
     });
 }
 
