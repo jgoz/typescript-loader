@@ -4,11 +4,11 @@
 
 import through = require("through2");
 
-function toSourcemap(request: string, source: string): NodeJS.ReadWriteStream {
+function toSourcemap(outputFileName: string, source: string): NodeJS.ReadWriteStream {
     return through.obj(function transform(data: NodeBuffer, enc: string, callback: Function) {
         var sourcemap = <webpack.SourceMap>JSON.parse(data.toString());
         sourcemap.sourcesContent = [source];
-        sourcemap.sources = [request];
+        sourcemap.sources = [outputFileName];
 
         this.push(sourcemap);
         callback();

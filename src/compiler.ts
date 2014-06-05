@@ -14,7 +14,7 @@ export interface CompileResult {
 
 export interface CompileContext {
     fileName: string;
-    webpackRequest?: string;
+    outputFileName?: string;
     source: string;
     options: ts.ICompilerOptions;
     onInfo?: (info: string) => void;
@@ -41,7 +41,7 @@ export function compile (ctx: CompileContext): Promise<CompileResult> {
                     var mapResult: ts.OutputFile = results.filter((res: ts.OutputFile) => {
                         return res.fileType === ts.api.OutputFileType.SourceMap;
                     })[0];
-                    sourcemap = transform.sourcemap(mapResult.text, ctx.webpackRequest, ctx.source);
+                    sourcemap = transform.sourcemap(mapResult.text, ctx.outputFileName, ctx.source);
                 }
 
                 Promise.all([output, sourcemap]).spread((o: string, sm: webpack.SourceMap) => {

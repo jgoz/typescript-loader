@@ -29,10 +29,10 @@ export function output(text: string, options: ts.ICompilerOptions): Promise<stri
     });
 }
 
-export function sourcemap(text: string, request: string, source: string): Promise<webpack.SourceMap> {
+export function sourcemap(text: string, outputFileName: string, source: string): Promise<webpack.SourceMap> {
     var textStream = new StringReader(text);
 
-    var sourcemapStream = textStream.pipe(toSourcemap(request, source));
+    var sourcemapStream = textStream.pipe(toSourcemap(outputFileName, source));
     textStream.resume();
 
     return new Promise<webpack.SourceMap>((resolve, reject) => {

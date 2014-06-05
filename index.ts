@@ -14,12 +14,12 @@ function replaceExt(filePath: string, ext: string) {
     return path.basename(filePath, path.extname(filePath)) + ext;
 }
 
-function loader (source: string): void {
+function loader(source: string): void {
     this.cacheable();
     this.async();
 
-    var loaderRequest = loaderUtils.getCurrentRequest(this);
-    var fileRequest = loaderUtils.getRemainingRequest(this);
+    var typescriptRequest = loaderUtils.getRemainingRequest(this);
+    var javascriptRequest = loaderUtils.getCurrentRequest(this);
 
     var options: ts.ICompilerOptions;
     try {
@@ -33,8 +33,8 @@ function loader (source: string): void {
     }
 
     compiler.compile({
-        fileName: fileRequest,
-        webpackRequest: loaderRequest,
+        fileName: typescriptRequest,
+        outputFileName: javascriptRequest,
         source: source,
         options: options,
         onInfo: this.emitWarning,
