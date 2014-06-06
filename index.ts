@@ -39,8 +39,10 @@ function loader(source: string): void {
         options: options,
         onInfo: this.emitWarning,
         onError: this.emitError
-    }).then(res => {
-        this.callback(null, res.output, res.sourcemap);
+    }).then(results => {
+        results.forEach(res => {
+            this.callback(null, res.output, res.sourcemap);
+        });
     }).catch(err => {
         this.callback(err);
     }).error(err => {
