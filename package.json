@@ -29,9 +29,9 @@
   "dependencies": {
     "bluebird": "^1.2",
     "loader-utils": "^0",
-    "typescript": "^1.0",
     "through2": "^0",
-    "ts-compiler": "^2"
+    "ts-compiler": "^2",
+    "typescript": "^1.0"
   },
   "devDependencies": {
     "glob": "^3",
