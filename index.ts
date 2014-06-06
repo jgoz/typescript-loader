@@ -8,6 +8,7 @@ import ts = require("ts-compiler");
 import Promise = require("bluebird");
 
 import compiler = require("./src/compiler");
+import util = require("./src/util");
 
 
 function replaceExt(filePath: string, ext: string) {
@@ -18,8 +19,8 @@ function loader(source: string): void {
     this.cacheable();
     this.async();
 
-    var typescriptRequest = loaderUtils.getRemainingRequest(this);
-    var javascriptRequest = loaderUtils.getCurrentRequest(this);
+    var typescriptRequest: string = loaderUtils.getRemainingRequest(this);
+    var javascriptRequest: string = loaderUtils.getCurrentRequest(this);
 
     var options: ts.ICompilerOptions;
     try {
@@ -40,11 +41,12 @@ function loader(source: string): void {
         onInfo: this.emitWarning,
         onError: this.emitError
     }).then(results => {
-        results.forEach(res => {
-            this.callback(null, res.output, res.sourcemap);
-        });
+        var expectedPath = path.normalize(typescriptRequest).replace(".ts", ".js");
+        var res = util.find(results, f => path.normalize(f.name).indexOf(expectedPath) >= 0);
+
+        this.callback(null, res.output, res.sourcemap);
     }).catch(err => {
-        this.callback(err);
+        this.emitError(err);
     }).error(err => {
         this.callback(err);
     });
