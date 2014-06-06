@@ -4,17 +4,8 @@ var glob = require("glob");
 var gulp = require("gulp");
 var gutil = require("gulp-util");
 var mocha = require("gulp-mocha");
-var jshint = require("gulp-jshint");
 var path = require("path");
 var spawn = require("child_process").spawn;
-
-//-------------------------------------------
-// Perform static analysis on project sources.
-gulp.task("jshint", function () {
-    return gulp.src(["*.js", "src/*.js", "tests/*.js"])
-        .pipe(jshint())
-        .pipe(jshint.reporter("jshint-stylish"));
-});
 
 //-------------------------------------------
 function build(src, watch, done) {
@@ -72,4 +63,4 @@ gulp.task("test:run", ["test:build"], function () {
 });
 
 gulp.task("test", ["test:build", "test:run"]);
-gulp.task("default", ["jshint", "test"]);
+gulp.task("default", ["build"]);
