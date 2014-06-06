@@ -10,10 +10,10 @@ import Stream = require("stream")
 import dependency = require("./transforms/dependency");
 import stripSourcemap = require("./transforms/strip-sourcemap");
 import toSourcemap = require("./transforms/sourcemap");
-import StringReader = require("./util/stringreader");
+import util = require("./util");
 
 export function output(text: string, options: ts.ICompilerOptions): Promise<string> {
-    var textStream = new StringReader(text);
+    var textStream = new util.StringReader(text);
 
     var outputStream = textStream
         .pipe(dependency(options))
@@ -30,7 +30,7 @@ export function output(text: string, options: ts.ICompilerOptions): Promise<stri
 }
 
 export function sourcemap(text: string, outputFileName: string, source: string): Promise<webpack.SourceMap> {
-    var textStream = new StringReader(text);
+    var textStream = new util.StringReader(text);
 
     var sourcemapStream = textStream.pipe(toSourcemap(outputFileName, source));
     textStream.resume();
