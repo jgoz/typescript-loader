@@ -30,7 +30,7 @@ var fixtures = {
 };
 
 describe("compiler", function() {
-    //this.timeout(5000);
+    this.timeout(5000);
 
     before(function() {
         if (fs.existsSync(outDir)) {
