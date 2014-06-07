@@ -92,4 +92,32 @@ describe("compiler", function() {
 
     });
 
+    describe("with module=commonjs", function() {
+
+        var compileResult: Promise<compiler.CompileResult>;
+
+        before(function() {
+            compileResult = compiler.compile(createContext(fixtures.b, { module: "commonjs" }));
+        });
+
+        it("translates import statements", function(done) {
+            compileResult.done(result => {
+                assert.ok(result.output.indexOf("var c = require(\"./c\")") >= 0, "import => var");
+                done();
+            });
+        });
+
+        it("translates <dependency> pragmas to require statements", function(done) {
+            compileResult.done(result => {
+                assert.ok(result.output.indexOf("require(\"./b.css\")") >= 0, "dependency with double quotes");
+                assert.ok(result.output.indexOf("require('./b.less')") >= 0, "dependency with single quotes");
+                assert.ok(result.output.indexOf("/// <dependency path=\"./b.css\" />") === -1, "strips pragma");
+                assert.ok(result.output.indexOf("/// <dependency path='./b.less' />") === -1, "strips pragma");
+                done();
+            });
+        });
+
+    });
+
+
 });
