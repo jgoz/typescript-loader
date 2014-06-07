@@ -18,6 +18,7 @@ build/Release
 
 # Build output
 dist
+tmp
 
 # Dependency directory
 # Deployed apps should consider commenting this line out:

@@ -36,11 +36,9 @@
   "devDependencies": {
     "glob": "^3",
     "gulp": "^3",
-    "gulp-jshint": "^1",
     "gulp-mocha": "*",
     "gulp-util": "^2",
-    "jshint": "^2",
-    "jshint-stylish": "*",
-    "mocha": "^1"
+    "mocha": "^1",
+    "rimraf": "^2.2.8"
   }
 }
