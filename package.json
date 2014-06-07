@@ -1,6 +1,6 @@
 {
   "name": "typescript-loader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typescript loader for webpack",
   "main": "dist/index.js",
   "files": [
@@ -29,8 +29,8 @@
   "dependencies": {
     "bluebird": "^1.2",
     "loader-utils": "^0",
+    "temp": "^0",
     "through2": "^0",
-    "ts-compiler": "^2",
     "typescript": "^1.0"
   },
   "devDependencies": {
@@ -38,6 +38,7 @@
     "gulp": "^3",
     "gulp-mocha": "*",
     "gulp-util": "^2",
-    "mocha": "^1"
+    "mocha": "^1",
+    "rimraf": "^2.2.8"
   }
 }
