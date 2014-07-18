@@ -104,7 +104,7 @@ function replaceExt(filePath: string, ext: string) {
 }
 
 export function compile (ctx: CompileContext): Promise<CompileResult> {
-    var args: string[] = getArgs(ctx.options).concat('"' + path.resolve(ctx.file) + '"');
+    var args: string[] = getArgs(ctx.options).concat(path.resolve(ctx.file));
     var tsc: string = getTsc(resolveTypeScriptBinPath());
 
     return executeNode([tsc].concat(args)).then(res => {
